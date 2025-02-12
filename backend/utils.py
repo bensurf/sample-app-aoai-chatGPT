@@ -77,10 +77,10 @@ def generateFilterString(userToken):
 
 def format_non_streaming_response(chatCompletion, history_metadata, apim_request_id = None):
     response_obj = {
-        "id": chatCompletion.id,
-        "model": chatCompletion.model,
-        "created": chatCompletion.created,
-        "object": chatCompletion.object,
+        "id": chatCompletion['id'],
+        "model": chatCompletion['model'],
+        "created": chatCompletion['created'],
+        "object": chatCompletion['object'],
         "choices": [{"messages": []}],
         "history_metadata": history_metadata,
         "apim-request-id": apim_request_id,
