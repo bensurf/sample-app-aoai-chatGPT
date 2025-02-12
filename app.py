@@ -347,9 +347,9 @@ async def send_chat_request(request_body, request_headers):
     model_args = prepare_model_args(request_body, request_headers)
 
     try:
-        azure_openai_client = await init_openai_client()
+        azure_openai_client = init_openai_client()
         #raw_response = await azure_openai_client.chat.completions.with_raw_response.create(**model_args)
-        raw_response = await azure_openai_client.complete(**model_args)
+        raw_response = azure_openai_client.complete(**model_args)
         response = raw_response.parse()
         apim_request_id = raw_response.headers.get("apim-request-id") 
     except Exception as e:
