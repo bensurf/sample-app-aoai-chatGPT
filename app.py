@@ -347,20 +347,22 @@ async def send_chat_request(request_body, request_headers):
     model_args = prepare_model_args(request_body, request_headers)
 
     try:
-        azure_openai_client = init_openai_client()
+        azure_openai_client = await init_openai_client()
         #raw_response = await azure_openai_client.chat.completions.with_raw_response.create(**model_args)
         raw_response = azure_openai_client.complete(**model_args)
-        response = raw_response.parse()
-        apim_request_id = raw_response.headers.get("apim-request-id") 
+        response = raw_response
+        # apim_request_id = raw_response.headers.get("apim-request-id") 
     except Exception as e:
         logging.exception("Exception in send_chat_request")
         raise e
 
-    return response, apim_request_id
+    return response
 
 
 async def complete_chat_request(request_body, request_headers):
     if app_settings.base_settings.use_promptflow:
+        raise Exception('Prompt flow not supported with Deepseek (in complete_chat_request())')
+    
         response = await promptflow_request(request_body)
         history_metadata = request_body.get("history_metadata", {})
         return format_pf_non_streaming_response(
@@ -370,12 +372,14 @@ async def complete_chat_request(request_body, request_headers):
             app_settings.promptflow.citations_field_name
         )
     else:
-        response, apim_request_id = await send_chat_request(request_body, request_headers)
+        response = await send_chat_request(request_body, request_headers)
         history_metadata = request_body.get("history_metadata", {})
-        return format_non_streaming_response(response, history_metadata, apim_request_id)
+        return format_non_streaming_response(response, history_metadata)
 
 
 async def stream_chat_request(request_body, request_headers):
+    raise Exception('Streaming responses not supported with Deepseek (in stream_chat_request())')
+
     response, apim_request_id = await send_chat_request(request_body, request_headers)
     history_metadata = request_body.get("history_metadata", {})
     
